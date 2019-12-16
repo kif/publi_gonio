@@ -477,8 +477,16 @@ or any of the dozens of fileformats supported by the FabIO library \cite{fabio}.
 
 \section{Calibration of a detector on a moving stage}
 
+The calibration of a detector mounted on a translation stage along the direct beam 
+has successfully been exploited by Dawn \cite{Filik:vg5068} and GSAS-II \cite{Horn:co5127} 
+to remove the correlation between the detector-distance and the energy of the beam. 
+While those two software packages offer an intuitive user interface for those experiments, 
+the modelisation of the translation stage remains hard-coded.
+This section describes how to describe programatically a moving stage in pyFAI, 
+calibrate the proposed model and use it to perform the azimuthal integration with many images. 
+
 The calibration of the detector position on a fixed goniometer position can be
-performed with pyFAI as long as at least two rings of the chosen calibrant are
+performed with pyFAI as long as several rings of the chosen calibrant are
 present in the image and that five control points can be extracted from one
 ring and at least one point from the second ring. 
 Of course, more points provide a better fit but this limit may be an issue
@@ -488,12 +496,12 @@ as small as 80x120 pixels).
 \subsection{Transformation of geometry}
 
 Here, the difficulty is not in the calibration, but rather in the
-variety of goniometers and translation tables which may be controlled by one or 
+variety of goniometers and translation stages which may be controlled by one or 
 multiple motors.
 %These motors are usually coupled with encoders, such as the actual position of
 %the motors is known precisely.
 The goniometer description implemented in pyFAI accepts an
-arbitrary number of motors attached to the goniometer/translation table. 
+arbitrary number of motors attached to the goniometer/translation stage. 
 % which may be named (must be named for more than one moving motor). 
 Let $motors = (motor_1, motor_2, \ldots, motor_n)$ be such motors. 
 
