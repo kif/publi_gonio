@@ -85,11 +85,11 @@ diffraction experiments.
 According to an internal survey performed among the beam-line scientists at
 the European Synchrotron (ESRF) in 2016, the factor limiting the users'
 productivity at diffraction beam-lines is the calibration of the experimental
-setup before accessing to the raw data for their reduction. 
+setup before the raw data can be reduced to analysable data
 The calibration issue is currently worked around by providing users with the
 proper geometry description or even the reduced data, but this prevents the
 re-processing at home institutes and also the re-interpretation of data which
-is needed as a part of the open data initiative.
+is needed as a part of the open data initiative \cite{FAIR2016}.
 
 At X-ray facilities like synchrotons, large area detectors are 
 preferred for gathering a maximum number of photons in
@@ -98,24 +98,24 @@ scattering, \ldots).
 % The still position of the detector during the acquisition, makes also
 %easier the data-reduction step.
 Using a fixed position setup combined with the speed of modern detectors (up
-to a few kHz) the data acquisition \textit{in situ} is easily
-performed to follow chemical reactions or other physical processes.
+to a few kHz) the data acquisition is easily
+performed to follow chemical reactions or other physical processes \textit{in situ}.
 Even with fixed geometries, determining the detector's position is
 still an issue for a majority of users. 
 Hence, a new graphical user interface has been developed for pyFAI
 \cite{pyFAI_0.18}, focusing on the user's experience to grant them autonomy in
 data analysis, once they are back in their home institutes.
 
-Unlike synchrotron sources, laboratory source diffractometers
+Laboratory source diffractometers
 are commonly equipped with (small) area detectors mounted on moveable goniometer
-arms for powder diffraction (for example, the Rigaku HyPix-3000 detector),
+arms for powder diffraction (for example, the Rigaku HyPix-3000 detector).
 %The larger number of pixels trades-of the resolution for speed.
-whereas detectors at synchrotrons are often mounted on goniometer or
-translation tables, those degrees of freedom (hereafter $dof$) are rarely used for data
-acquisition.
+Detectors at synchrotrons are often mounted on goniometer or
+translation tables to provide the degrees of freedom (hereafter $dof$) which are 
+needed to aligning the beam-line, although those $dof$ are rarely used for data acquisition.
 One counter-example is reported in \cite{Gao:kc5032}, where the beam-line
 is equipped with a moving strip-detector, the Mythen detector (1D) from Dectris,
-which is not an area detector.
+but the Mythen is not an area detector.
 
 %On the opposite, moving detector setups are rarely
 %used at synchrotrons for the data acquisition itself, even if most of the
@@ -124,25 +124,28 @@ which is not an area detector.
 
 
 %High-Q diffraction signal acquisition is needed  for
-Pair Distribution Function (\textsc{pdf}) analysis requires very large
+Pair Distribution Function (\textsc{pdf}) analysis typically requires very large area
 detectors and higher energies to be able to cover the needed high $q$-range in
 one single frame \cite{Chupas:wf5000}.
 When speed is not critical, \textsc{pdf} experiments could be performed
-with smaller detectors mounted on a motorized arm, and moved in front of
+with small area detectors mounted on a motorized arm, and moved in front of
 the sample during the data acquisition to cover a larger solid angle. 
-This kind of setup is actually already available on most diffraction
-beam-lines. 
-A new pyFAI module dealing with goniometers and moving detectors is also presented.
+A new pyFAI module which is dealing with goniometers and moving detectors is also presented.
+It offers to exploit the positioning system of the detector 
+(often readily available on beam-lines) to acquire powder diffraction or \textsc{pdf} data 
+on larger $q$-range with no additional cost or investment.
 
-The pyFAI library \cite{fv5028}, is briefly introduced, followed by a description of
-how to merge multiple diffraction images acquired at different positions with this
-library \cite{PyFAI_PDJ}. 
+The pyFAI library \cite{fv5028}, is first briefly introduced, 
+%followed by a description of how to merge multiple diffraction images 
+then the way of merging multiple diffraction images
+acquired at different positions is demonstrated as in \cite{PyFAI_PDJ}. 
 After summarizing how calibration works in pyFAI, the new graphical user
 interface is presented.
 Finally, the procedure on how to calibrate the absolute position of
 every single pixel in the detector when mounted on a goniometer (or on a
-translation table) as a function of the goniometer motor positions, is
-described assuming actuators are precise and coupled with encoders. 
+translation stage) as a function of motor positions, is
+described.
+% assuming actuators are precise and coupled with encoders. 
 
 \section{The Python Fast Azimuthal Integration library (pyFAI)}
 
@@ -151,11 +154,11 @@ PyFAI is a Python \cite{python} library used to transform 2D diffraction images 
 coordinates. 
 The radial units are typically the scattering angle  
 $2\theta$ or the momentum transfer $q=4\pi \sin(\theta)/\lambda$.
-PyFAI also provides tools to calibrate the detector position, i.e.
+PyFAI also provides additional tools to calibrate the detector position, i.e.
 to determine its location in space by means of Debye-Scherrer conical rings
 resulting from the intersection of the diffracted X-ray beam with the
 detector surface. 
-The rings are deformed into ellipses when the detector is planar but 
+The observed rings are deformed into ellipses when the detector is planar but 
 slightly inclined. 
 The azimuthal integration is performed in two steps. 
 The first is a pixel-wise
