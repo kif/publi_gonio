@@ -262,17 +262,32 @@ the $2\theta$ values calculated for the different control points.
 For non-planar detectors these ``rings'' can be any curve, while on planar 
 detectors in transmission mode, they are simply ellipses.
 
-
-The least-squares refinement is optimizing a set of six geometrical parameters
-(seven when adding the energy), defined around the Point Of Normal Incidence 
-(hereafter named \textsc{poni}, Figure \ref{poni}).
-The \textsc{poni} is
-the orthogonal projection of the sample position on the detector plane (or
+Intuitively, the easiest geometry to perform the calibration is built upon 
+the beam-center definition, this is the intersection of the direct beam with the detector. 
+This geometry has been first introduced in FIT2D \cite{Hammersley:fs5107} 
+and re-used in many software packages like GSAS-II \cite{Toby:aj5212} and 
+Dawn \cite{Filik:vg5068} which offer more user-friendly interfaces.
+The FIT2D-geometry reaches its limits when the detector is heavily tilted, and it is not 
+even possible to describe a detector mounted parallel to the beam (which is sometimes used in 
+reflection geometry).
+PyFAI's geometry has been inspired by SPD \cite{Boesecke:aj6013} which is able to describe any 
+detector position in space. 
+This geometry is based on the concept of Point Of Normal Incidence 
+(hereafter named \textsc{poni}, Figure \ref{poni}), which is 
+the orthogonal projection of the sample position (origin) on the detector plane (or
 the plane $z=d_3=0$ when the detector is non-planar and $z$ varies from pixel to pixel).
-This \textsc{poni} differs from the beam-center used in programs like
-Fit2D \cite{Hammersley:fs5107} since the \textsc{poni} is defined, 
-regardless of the tilt of the detector, and often lies
-within the detector's surface to gather a maximum amount of photons scattered from the sample.
+It is worth noting that the \textsc{poni} is co-located with the beam-center when the 
+detector is not tilted but 
+the \textsc{poni} is more likely than the beam-center to be located within the detector's 
+surface when the detector is heavily tilted. 
+Indeed, a detector facing the sample allows to gather a maximum amount of photons scattered.
+Conversion tools between geometries are provided by pyFAI and documented in \cite{Detlefs2019}.
+
+The least-squares refinement is optimizing a set of six geometrical parameters:
+the three translations corresponding to the coordinates of the \textsc{poni} and
+the three rotations corresponding on the tilt of the detector around three orthogonal axes.
+This makes seven parameters to refine when considering in addition the energy or the wavelength. 
+
 
 \begin{figure}
 \label{poni}
