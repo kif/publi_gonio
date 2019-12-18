@@ -673,15 +673,26 @@ suited to powder diffraction experiments for any detector position.
 
 In this example, all motor positions used for calibration were withing the accessible range, 
 hence we have been doing interpolation.
-In the next example will check in what extent extrapolation outside the calibration range is possible.
+In the next example will check to what extent extrapolation outside the calibration range is possible.
   
 \subsection{A more realistic example: a single axis goniometer}
 
 Probably the main application of this work is to place a small sized area detector
-on a goniometer $2\theta$ arm. 
+on a goniometer $2\theta$ arm in replacement of a punctual detector (e.g. diode) for 
+powder diffraction measurements. 
+The initial idea was to use a small region of interest (ROI) in the center of
+an area detector, and check whether it was possible to rebuild a powder diffraction pattern
+when moving the detector at various goniometer angles.
+This ROI has to be of limited size in the dimension orthogonal to the ring and as extended
+as possible in the tangential direction, with the limit of the curvature of the ring 
+(especially at low $2\theta$ angles).
+We considered a ROI of 10 pixels wide within a Pilatus 100k (487x195 pixels)
+which means using only 2\% of the width of the detector (different lines being used for different bins). 
+By using the full detector area, one could get a seven times improvement in the signal/noise ratio
+($\sqrt{487/10}$) if the movement of the detector on the goniometer was perfectly predictable.
 
 When the detector arm is moving in the vertical plane (hence around an horizontal axis), 
-a simple \textit{geometry transformation} is defined with $rot_2$ (in radians) as a
+a simple \textit{geometry transformation} is defined with $rot_2$ (horizontal, in radians) as a
 linear transformation of the motor position, $pos$, (measured in degrees).
 The scale parameter, $scale = \pi / 180$, is used to convert degrees to radians.
 The other parameters $dist$, $poni_1$, $poni_2$ and $rot_1$ are directly mapped
@@ -709,13 +720,13 @@ from 5 to 65 degrees in half-degree steps on the ROBL beam-line
 \cite{Kvashnina:vv5126}, ESRF BM20.
 In this experiment, 121 diffraction images of LaB$_6$
 reference compound material were acquired.
-Due to the small size of the detector (487x197 pixels),
+Due to the small size of the detector,
 some of the images present no rings at all (especially at low $2\theta$ angle),
 most have only one ring and only a few images display 2 rings. 
-Even if those images, which are technically suitable for 
-static detector calibration using the \textit{pyFAI-calib2} tool,
-represent a challenge for calibration due to the large 
-diffraction angles (>30°), the low curvature of the ring and the difficulty to 
+Even if those images are technically suitable for 
+static detector calibration,
+they still represent a challenge due to the large 
+diffraction angles ($2\theta >30^o$), the low curvature of the rings and the difficulty to 
 assign the picked peaks to the proper calibrant ring number.
 
 %The first images presenting two rings correspond to goniometer positions above
@@ -726,8 +737,8 @@ degrees have been manually calibrated,
 %presented in the previous section.
 %This manual calibration is rather tedious and unstable due to the small
 %curvature of the rings on the detector image. 
-fixing the rotation along axis 1 of the detector ($rot_1=0$) has been kept fixed to
-guarantee some consistency between the four images.
+fixing the rotation along axis 1 of the detector ($rot_1=0$) 
+to guarantee some consistency between the four images.
 
 
 \begin{figure}
@@ -763,9 +774,9 @@ the first few peaks look exceedingly broad.
 \includegraphics[width=9cm]{images/gonio_insert}
 \caption{Powder diffraction pattern obtained from 121 Pilatus 100k images acquired
 at goniometer angles ranging from 5 to 65 degrees on LaB6 reference sample at 16 keV. 
-The insert is a close-up view on the first peak showing the sharpness of the peak depending on the model.
-In the simple model, in orange, only $rot_2$ depends linearly on the goniometer angle (6 $dof$).
-The while the advanced model, in blue, both rotation $rot_1$ and $rot_2$ depend linearly on the goniometer angle (7 $dof$).}
+The insert is a close-up view on the first peak showing the sharpness of the signal depending on the model.
+The orange curve correspond to the simple model where $rot_2$ depends linearly on the goniometer angle (6 $dof$).
+The blue curve corresponds to an advanced model where both rotations($rot_1$ and $rot_2$) depend linearly on the goniometer angle (7 $dof$).}
 \end{center}
 \end{figure}
 
@@ -840,13 +851,13 @@ As the resolution of the powder diffraction pattern obtained is often limited by
 pixel size (and the sample-detector distance), this shrinkage of
 pixel sizes leads naturally to higher quality powder
 diffraction patterns.
-Unfortunately, to keep the surface of the detector constant, one would need
+Unfortunately, to keep the area of the detector constant, one would need
 to multiply the number of pixels by the square of the pixel size reduction
 factor, and the associated infrastructure for read-out and data transfer
 accordingly.
 Moving the detector offers a flexibility which partially removes this
 limitation.
-TODO
+
 
 \section{Conclusion}
 
