@@ -85,7 +85,7 @@ diffraction experiments.
 According to an internal survey performed among the beam-line scientists at
 the European Synchrotron (ESRF) in 2016, the factor limiting the users'
 productivity at diffraction beam-lines is the calibration of the experimental
-setup before the raw data can be reduced to analysable data
+setup before the raw data can be reduced to analysable data.
 The calibration issue is currently worked around by providing users with the
 proper geometry description or even the reduced data, but this prevents the
 re-processing at home institutes and also the re-interpretation of data which
@@ -111,8 +111,8 @@ are commonly equipped with (small) area detectors mounted on moveable goniometer
 arms for powder diffraction (for example, the Rigaku HyPix-3000 detector).
 %The larger number of pixels trades-of the resolution for speed.
 Detectors at synchrotrons are often mounted on goniometer or
-translation tables to provide the degrees of freedom (hereafter $dof$) which are 
-needed to aligning the beam-line, although those $dof$ are rarely used for data acquisition.
+translation tables to provide the degrees of freedom (hereafter $DoF$) which are 
+needed to aligning the beam-line, although those $DoF$ are rarely used for data acquisition.
 One counter-example is reported in \cite{Gao:kc5032}, where the beam-line
 is equipped with a moving strip-detector, the Mythen detector (1D) from Dectris,
 but the Mythen is not an area detector.
@@ -183,21 +183,20 @@ The numerator of equation (1) will hereafter be referred as
 \textit{signal}, whilst the denominator will be referred as
 \textit{normalization}. 
 The \textit{variance} associated to the \textit{signal} of every single pixel can be estimated 
-from statistical distributions assuming for example the detecor has a Poissonian behaviour. 
+from statistical distributions assuming for example the detector has a Poissonian behaviour. 
 This \textit{variance} needs to be scaled in a similar way when considering error propagation.
 
 The second step is the re-binning of the data, which is carried out 
 using histograms of the radial positions, 
 weighted by either the \textit{signal} or \textit{normalization}
 as described in \citeasnoun{kieffer_ashiotis-proc-euroscipy-2014}.
-PyFAI defines many radial units, among which the scattering angle $2\theta$
-and the modulus of the scattering vector $q$ are the most commonly used.
-This procedure sums the \textit{signal} (resp. \textit{normalization}) for all pixels
-having a radius which falls into the given radial bin .
-
+%PyFAI defines many radial units, among which the scattering angle $2\theta$
+%and the modulus of the scattering vector $q$ are the most commonly used.
+This histogram sums the \textit{signal} (resp. \textit{normalization}) for all pixels
+having a radius corresponding to a given radial bin (this set of pixel is noted $bin_r$).
 The intensity averaged over all pixels located at a given radial value is then simply 
-the ratio of the two histogram which bin corresponds to the radius of interest (2) 
-while the associated error, the standard error of the mean, is given by (3):
+the ratio of the two histograms which bin corresponds to the radius of interest, equation (2). 
+The propagated error (standard error of the mean) is given in equation (3).
 
 \begin{equation}
 <I>_{r} = \frac{\sum\limits_{i \in bin_r} c_i \cdot signal_i}
@@ -208,16 +207,17 @@ while the associated error, the standard error of the mean, is given by (3):
                   {\sum\limits_{i \in bin_r} c_i \cdot normalization_i} 
 \end{equation}
 
-In equations (2) and (3), $c_i \in [0..1]$ is used to describe pixel splitting and 
-corresponds to the fraction of a pixel area falling into a specific histogram bin. 
+In equations (2) and (3), $c_i$ is used to describe pixel splitting and 
+corresponds to the fraction of the pixel area falling into the specific histogram bin 
+($0\leq c_i \leq1$). 
 The multiple pixel splitting schemes available in pyFAI, called full-splitting, 
-bounding-box-splitting and no-splitting differ have been described in
+bounding-box-splitting and no-splitting have been described in
 \citeasnoun{fv5028}.
 
 The integration scheme presented in equation (2) is an improvement over 
-former versions of pyFAI (<0.18) which was using equation (4) where error propagation 
-was not correct as pixels with smaller area, further away from the sample or weaker tend to be 
-over-represented in the statistic.
+former versions of pyFAI (version <0.18) which was using equation (4) where the error propagation 
+was not properly performed as pixels with smaller normalization factors were  
+over-represented in the associated errors.
 
 \begin{equation}
 <I>_{r} = \frac{\sum\limits_{i \in bin_r} \frac{ c_i \cdot
@@ -231,7 +231,7 @@ The pyFAI integration scheme of multiple images taken at various positions has
 first been reported in \citeasnoun{PyFAI_PDJ}. 
 The procedure is conceptually similar to the integration on a single image,
 except that all histograms need to calculated over the very same
-grid to allow histograms from all images to be summed as described in (5). 
+grid (bin positions) to allow histograms from all images to be summed together as described in equation (5). 
 
 \begin{equation}
 <I>_{r} = \frac{\sum\limits_{imges} \sum\limits_{i \in bin_r} c_i \cdot
@@ -239,7 +239,7 @@ signal_i} {\sum\limits_{imges} \sum\limits_{i \in bin_r} c_i \cdot
 normalization_i} 
 \end{equation}
 
-The normalization for solid angle correction $\Omega$ has to be performed
+The normalization for solid angle correction, $\Omega$, has to be performed
 using an absolute solid angle reference system (unlike the case of single
 frame integration) as different geometries may have very different
 sample-to-detector distances.
@@ -267,10 +267,10 @@ Intuitively, the easiest geometry to perform the calibration is built upon
 the beam-center definition, which is the intersection of the direct beam with the detector. 
 This geometry has been first introduced in FIT2D \cite{Hammersley:fs5107} 
 and re-used in many software packages like GSAS-II \cite{Toby:aj5212} and 
-Dawn \cite{Filik:vg5068} which offer more user-friendly interfaces.
+Dawn \cite{Filik:vg5068} which offer in addition user-friendly interfaces.
 The FIT2D-geometry reaches its limits when the detector is heavily tilted, and it is not 
-even possible to describe a detector mounted parallel to the beam (which is sometimes used in 
-reflection geometry).
+even possible to describe a detector mounted parallel to the beam 
+(which is sometimes used on laboratory sources in reflection geometry).
 The geometry used in pyFAI is based on the definition of the Point Of Normal Incidence 
 (hereafter named \textsc{poni}, Figure \ref{poni}), which is 
 the orthogonal projection of the sample position (the origin in pyFAI) on the detector plane (or
@@ -278,10 +278,10 @@ the plane $z=d_3=0$ when the detector is non-planar and $z$ varies from pixel to
 This geometry is inspired by SPD \cite{Boesecke:aj6013} and is capable of describing any 
 detector position in space. 
 It is worth noting that the \textsc{poni} is co-located with the beam-center when the 
-detector is not tilted, i.e. mounted orthogonal to the incident beam. 
+detector is not tilted, i.e. mounted orthogonal to the direct beam. 
 Moreover the \textsc{poni} is more likely than the beam-center to be located within the detector's 
-surface when the detector is heavily tilted (since the detector gathers more photonswhen facing the sample). 
-Some geometry conversion tools are provided by pyFAI and documented in \cite{Detlefs2019}.
+surface when the detector is heavily tilted (since the detector gathers more photons when facing the sample). 
+Some geometry conversion tools are provided by pyFAI and documented in \citeasnoun{Detlefs2019}.
 
 \begin{figure}
 \label{poni}
@@ -352,8 +352,8 @@ The drawback is that some parameters are correlated or not optimized:
 
 \begin{itemize}
   \item \textit{dist-wavelength}: reducing the wavelength is nearly equivalent
-  to increasing the distance unless the diffraction angle $2\theta$ is 
-  large ($>30^o$). 
+  to increasing the distance unless the diffraction angle is 
+  large ($2\theta>30^o$). 
   It is advisable to fix one of the two variables unless the data are good
   quality and the scattering range is very large. 
   This is an intrinsic limitation of the single image approach.
@@ -361,7 +361,7 @@ The drawback is that some parameters are correlated or not optimized:
   mistaken for larger translations. 
   Fixing one of the two decreases the uncertainty of the other by several orders of
   magnitude. 
-  The user interface offers a ``SAXS constrains`` to lock the detector normal to the direct beam.
+  The user interface offers a ``SAXS constrains'' button to lock the detector normal to the direct beam.
   \item $rot_3$ cannot be refined from Debye-Scherrer cones as they are, by definition,
   invariant by rotation around the incoming beam. 
   The $rot_3$ parameter can be
@@ -373,28 +373,28 @@ The drawback is that some parameters are correlated or not optimized:
 \end{itemize}
  
 Those calibration parameters containing the geometry of the experimental setup 
-are saved in a text file with the ``.poni'' extension, 
-also contains the detector definition and the wavelength.
+are saved in text files with the ``.poni'' extension, 
+also containing the detector definition and the wavelength.
 %which contains in addition the detector definition and the wavelength.
-This file can subsequently be loaded into an \textit{azimuthal integrator}
-object, ready to perform the azimuthal regrouping an image coming from the detector.
+Such file can subsequently be loaded into an \textit{azimuthal integrator}
+object, ready to perform the azimuthal regrouping of images coming from the detector.
 
 \subsection{Graphical user interface}
 
 A semi-graphical calibration tool has been available as part of pyFAI
-\cite{fv5028} since the origin of the project, but this tool was considered too
+since the origin of the project \cite{fv5028}, but this tool was considered too
 difficult to use by inexperienced users.
 Thus, many groups have developed their own graphical user interface on top of
 pyFAI, often optimized for their specific setup or experiment:
 Dioptas \cite{diopta_publi} focusing on high pressure experiments, 
-Dpdak \cite{dpdak} for online SAXS reduction, 
+Dpdak \cite{dpdak} for online SAXS, 
 NanoPeakCell \cite{nanopeakcell} for serial crystallography,
 PySAXS \cite{pysaxs}, WiSAXS or xPDFsuite \cite{xpdfsuite} to cite a few.
 
 Following the survey conducted among the beam-line scientists of the ESRF, a
 new graphical user interface (GUI) design was developed on top of pyFAI.
 % in order to replace FIT2D, discontinued in 2019 \cite{fit2d-gitlab}. 
-This new GUI, \textit{pyFAI-calib2}, is based on the $silx$ scientific widgets \cite{silx_v0.5.0}, 
+This new GUI, called \textit{pyFAI-calib2}, is based on the $silx$ scientific widgets \cite{silx_v0.5.0}, 
 itself based on the PyQt5 library \cite{pyqt}.  
 The \textit{pyFAI-calib2} tool has been specifically designed to address the needs 
 of novice users, but should perform equally well regardless to the scientific field 
@@ -416,16 +416,16 @@ subsequent tabs within the graphical interface:
   \ref{calib_3}),
   \item{Geometry fitting:} At this stage, the detector position and
   wavelength are fitted against peak positions and ring numbers. 
-  Any of the  parameters can be fixed or let free for refinement.
-  The (calculated) positions of the beam center and the \textsc{poni}
+  Any of the parameters can be fixed or let free for refinement, possibly with boundaries.
+  The (calculated) positions of the beam center, the \textsc{poni}
   and the expected positions of rings are overlaid onto the diffraction image
   to assess visually the quality of the fit. Sample, detector 
   and direct beam can also be visualized in 3D (Figure \ref{calib_4}). 
   \item{Integration:} This tab displays the 1D and 2D integrated patterns, also
   called powder diffraction profile and caked-image to further validate the
   modelling of the experimental setup (Figure \ref{calib_5}). 
-  The algorithm for integrating, the pixel splitting scheme and the radial unit
-  can also be selected in this tab. 
+  The algorithm used for integration, the pixel splitting scheme and the radial unit
+  can also be changed in this tab. 
   Diffraction profiles can be saved as text-files or images as well as the
   experimental setup description file (\textsc{poni}-file) for subsequent use with other tools from
   the pyFAI suite.
@@ -435,17 +435,20 @@ subsequent tabs within the graphical interface:
 \label{calib_1}
 \begin{center}
 \includegraphics[width=15cm]{images/1_experiment}
-\caption{Experiment settings tab: load the calibration image, set the energy, the calibrant and select the detector for the subsequent analysis.}
+\caption{The experiment settings tab is used to load the calibration image, set the energy, the calibrant and select the detector for the subsequent analysis.
+         The binning mode of the detector is automatically guessed.}
 \end{center}
 \end{figure}
+
 \begin{figure}
 \label{calib_2}
 \begin{center}
 \includegraphics[width=15cm]{images/2_mask}
 \caption{The mask drawing tool is used to exclude pixels using a rectangular, polygonal or pencil selection. 
-         Pixels can also be selected according to their value (thresholding)}
+         Pixels can also be selected according to their value (thresholding).}
 \end{center}
 \end{figure}
+
 \begin{figure}
 \label{calib_3}
 \begin{center}
@@ -454,6 +457,7 @@ subsequent tabs within the graphical interface:
          to be assigned to the correct calibrant ring number in the right-hand side panel.}
 \end{center}
 \end{figure}
+
 \begin{figure}
 \label{calib_4}
 \begin{center}
@@ -462,6 +466,7 @@ subsequent tabs within the graphical interface:
 		 A 3D representation of the experimental setup allows visualization of the relative position of the sample, the direct beam and the detector after fitting.}
 \end{center}
 \end{figure}
+
 \begin{figure}
 \label{calib_5}
 \begin{center}
@@ -489,16 +494,16 @@ or any of the dozens of file-formats supported by the FabIO library \cite{fabio}
 
 The calibration of a detector mounted on a translation stage along the direct beam 
 has successfully been exploited by Dawn \cite{Filik:vg5068} and GSAS-II \cite{Horn:co5127} 
-to remove the correlation between the detector-distance and the energy of the beam. 
+to remove the correlation between the detector distance and the energy of the beam. 
 While those two software packages offer an intuitive user interface for those experiments, 
-the modelisation of the translation stage remains hard-coded.
-This section describes how to describe programatically a moving stage in pyFAI, 
+the modelization of the translation stage remains hard-coded.
+This section explains how to describe programmatically a moving stage in pyFAI, 
 calibrate the proposed model and use it to perform the azimuthal integration with many images. 
 
 The calibration of the detector position on a fixed goniometer position can be
 performed with pyFAI as long as several rings of the chosen calibrant are
 present in the image and that five control points can be extracted from one
-ring and at least one point from the second ring. 
+ring and at least one point from another ring. 
 Of course, more points provide a better fit but this limit of two visible rings 
 may be an issue when very small area detectors are used (e.g. the ImXPAD S10).
 
@@ -512,20 +517,21 @@ multiple motors.
 The goniometer description implemented in pyFAI accepts an
 arbitrary number of motors attached to the goniometer/translation stage. 
 % which may be named (must be named for more than one moving motor). 
-Let $motors$ be the list of all $n$ motors moved during the acquisition: 
+Let $motors$ be this list of $n$ motors moved during the acquisition: 
 $(motor_1, motor_2, \ldots, motor_n)$. 
 
-Calibrating the goniometer consists of:
+Calibrating the goniometer consists of defining a model and optimizing it:
 \begin{itemize}
-  \item defining a list of $m$ parameters ($params$) to describe the position of the goniometer:
-  $(param_1, param_2, \ldots, param_m)$,
-  \item defining six \textit{transformation functions} $\Re$ which transforms motor positions ($motors$)
+  \item Choose a list of $m$ static parameters for the model which are used to describe the position of the detector;
+  $m$ being the number of $DoF$ of the model:
+  $params = (param_1, param_2, \ldots, param_m)$,
+  \item define the six \textit{transformation functions} $\Re$ which transforms motor positions ($motors$)
   and goniometer parameters ($params$) into the six \textsc{poni}-parameters used to
   initialize an azimuthal integrator in pyFAI:
 \begin{equation}
 P_{pyFAI} = (dist, poni_1, poni_2, rot_1, rot_2, rot_3) = \Re_{params}(motors)
 \end{equation}
-  \item optimizing the parameter set of the goniometer ($params$) so that
+  \item optimize the parameter set of the goniometer ($params$) so that,
   for any position of the motors, the detector position are expressed as
   a \textsc{poni}-parameters set.
 \end{itemize}
@@ -543,49 +549,50 @@ are then used to
 calculate the experimentally observed $2\theta_{exp}$ position of the peaks over all control
 points.
 Those $2\theta_{exp}$ are compared to
-the theoretically expected $2\theta_{theo}$ values calculated from the calibrant d-spacing and
+the theoretically expected $2\theta_{theo}$ values calculated from the calibrant $d-$spacing and
 from the wavelength.
 
-$$
+\begin{equation}
 \Delta 2\theta = 2\theta _{exp} - 2\theta _{theo} =
 \arctan(\frac{r(P_{pyFAI})}{d(P_{pyFAI})}) -  2 \cdot
 \arcsin(\frac{\lambda}{2d})
-$$
+\end{equation}
 
 
 The average of the squares of these differences is used as a cost function
 to optimise those parameters using the \textit{scipy.optimize.minimize}
 function from SciPy \cite{scipy}.
 
-$$
+\begin{equation}
 CostFunct = \frac{ \sum\limits_{i \in CtlPts} {(\Delta 2\theta_i)^2}}
-{count(CtlPts)} $$
+{count(CtlPts)} 
+\end{equation}
 
 From a computer engineering perspective, 
 those \textit{transformation functions} present several contradictory challenges: 
 the user should be able to express any numerical transformation (flexibilty),
 but he should be prevented from executing any arbitrary code (security).  
-Moreover those functions should be made persistable on disk (i.e. save) and 
+Moreover those functions should be made persistable on disk (i.e. save them) and 
 allow their restoration without having to re-perform the calibration, nor 
-opening any security holes. 
+creating vulnerabilities. 
 
 The \textit{NumExpr} library \cite{numexpr} allows the evaluation of 
 textual mathematical formulae into numerical
-functions offering an arbitrary number of parameters (or $dof$) for 
+functions offering an arbitrary number of parameters for 
 the goniometer definition and as many motors as needed.
-As \textit{NumExpr} is a mathematical compiler, it cannot execute other code. 
-Those mathematical expressions are then simply saved together with the motor names 
+\textit{NumExpr} being a mathematical compiler, it cannot execute other type of code. 
+The mathematical expressions provided by the user are simply saved together with the motor names 
 and the parameter names and values in a \textsc{json}-format for persistence.
 
 In the follow example, the definition of those functions is simply the creation 
 of an object from the 
 \textit{GeometryTransformation} class (i.e. $instantiation$), with a list of
-motor names, parameter names, as well as a set of six formulae, one for each of
-the six \textsc{poni}-parameters.
+motor names ($pos\_names$), parameter names ($param\_names$), as well as a set of six formulae, 
+one for each of the six \textsc{poni}-parameters.
 
 \subsection{A simple example: the translation table}
 
-At the  ESRF, the protein crystallography beam-lines use large pixel detectors
+At the  ESRF, the protein crystallography beam-lines use large area pixel detectors
 (typically Pilatus 6M from Dectris) placed on a translation table which allows
 collection of the data at the optimal distance: shorter sample-to-detector
 distances to explore the region for high-$q$ 
@@ -610,26 +617,26 @@ gt = GeometryTransformation(param_names = ["dist_offset", "dist_scale",
                             rot3_expr="0.0")
 \end{verbatim}
  
-In the example above, we chose to use six parameters for the goniometer
-geometry, most of them matching exactly as those of pyFAI: 
+In the example above, a six-parameter model was chosen for the goniometer
+geometry, most parameters matching exactly those of pyFAI: 
 $poni_1$, $poni_2$, $rot_1$
 and $rot_2$. 
 $rot_3$ is forced to zero while the distance is defined as a 
 linear function of the motor position. 
-Motor names should be declared in \textit{pos\_names} as a list, 
-if not, a single motor configuration is assumed (motor named $pos$).
+%Motor names should be declared in \textit{pos\_names} as a list, 
+%if not, a single motor configuration is assumed (motor named $pos$).
 
 The content of this tutorial is available as a Jupyter
 notebook \cite{ipython} and forms part of the official documentation of pyFAI
-\cite{translation_table}, this document is directly visible in a web-browser. 
-In addition, one can replay the notebook with Jupyter and the notebook is
-self-consistent: all images are automatically downloaded and cells can be
+\cite{translation_table}, it is directly visible in a web-browser. 
+In addition, one can replay the notebook with Jupyter as it is self-consistent: 
+all images are automatically downloaded and cells can be
 modified or adapted.
 The notebook presents the usage of the \textit{transformation function} class
 together with the translation table refinement.
 Initially, this set of data was calibrated using the ``MX-calibrate'' tool
-that automatically extracts the control points from images taken at
-ESRF ID29 beam-lines (Protein crystallography beam-line, energy: 12.75 keV) from
+which automatically extracts the control points from images taken at
+ESRF ID29 beam-line (energy: 12.75 keV) from
 the metadata written in the image headers, thus a set of control points is
 available prior to processing the data. 
 The translation table is calibrated using all control points
@@ -647,14 +654,14 @@ The blue curve corresponds to this initial model refined; the two peaks look
 \caption{Powder diffraction profile obtained from seven images acquired
 at various distances from 15 to 45 centimeters. 
 The translation table position is combined with 6 (resp. 8) parameters model
-fitted where the $dist$ (resp. $dist$, $poni_1$ and $poni_2$) depends on the
+fitted where the $dist$ (resp. $dist$, $poni_1$ and $poni_2$) depends linearly on the
 table position.}
 \end{center}
 \end{figure}
 
 To address this poor modelling, another \textit{transformation function} is
-defined, with a few additional $dof$ on the \textsc{poni} position
-(i.e. the translation table is not perfectly parallel to the incident beam).
+defined, with a few additional $DoF$ on the \textsc{poni} position
+(hypothesis: the translation table is not perfectly parallel to the incident beam).
 %(linear dependency of the \textsc{poni} with the table position).
 Once three parameters ($dist$, $poni_1$ and $poni_2$) have been re-fitted and 
 all data integrated with the new model, one obtains the orange
@@ -671,11 +678,11 @@ beam to deflect away from the horizontal.
 Once everything is fitted, the quality of the geometry obtained is perfectly
 suited to powder diffraction experiments for any detector position.
 
-In this example, all motor positions used for calibration were withing the accessible range, 
-hence we have been doing interpolation.
-In the next example will check to what extent extrapolation outside the calibration range is possible.
+In this example, all motor positions used for calibration were within the accessible range, 
+hence positions have been interpolated.
+In the next example will validate that extrapolation outside the calibration range is also possible.
   
-\subsection{A more realistic example: a single axis goniometer}
+\subsection{A more realistic example: the single axis goniometer}
 
 Probably the main application of this work is to place a small sized area detector
 on a goniometer $2\theta$ arm in replacement of a punctual detector (e.g. diode) for 
@@ -687,14 +694,14 @@ This ROI has to be of limited size in the dimension orthogonal to the ring and a
 as possible in the tangential direction, with the limit of the curvature of the ring 
 (especially at low $2\theta$ angles).
 We considered a ROI of 10 pixels wide within a Pilatus 100k (487x195 pixels)
-which means using only 2\% of the width of the detector (different lines being used for different bins). 
+which means using only 2\% of the total width of the detector (different lines being used for different bins). 
 By using the full detector area, one could get a seven times improvement in the signal/noise ratio
 ($\sqrt{487/10}$) if the movement of the detector on the goniometer was perfectly predictable.
 
-When the detector arm is moving in the vertical plane (hence around an horizontal axis), 
-a simple \textit{geometry transformation} is defined with $rot_2$ (horizontal, in radians) as a
-linear transformation of the motor position, $pos$, (measured in degrees).
-The scale parameter, $scale = \pi / 180$, is used to convert degrees to radians.
+When the detector arm is moving in the vertical plane (around an horizontal axis), 
+a simple \textit{geometry transformation} is defined with $rot_2$ (in radians) as a
+linear transformation of the motor position, $pos$, (default motor name, here measured in degrees by the goniometer).
+The scale parameter, $scale = \pi / 180$, is used to convert angular units.
 The other parameters $dist$, $poni_1$, $poni_2$ and $rot_1$ are directly mapped
 to pyFAI's parameters.
 As previously, $rot_3$ is kept fixed at zero.
@@ -714,8 +721,8 @@ goniotrans = GeometryTransformation(param_names = ["dist", "poni1", "poni2", "ro
 
 This example is also available in a Jupyter notebook \cite{rotation_pilatus} 
 and the workflow used is depicted in Figure \ref{workflow}.
-This experiment has been performed using a single module (100k) Pilatus
-detector which is mounted on a vertically moving $2\theta$ arm, varying 
+This experiment has been performed using a single module Pilatus (100k)
+detector which is mounted on a $2\theta$ arm, moving 
 from 5 to 65 degrees in half-degree steps on the ROBL beam-line
 \cite{Kvashnina:vv5126}, ESRF BM20.
 In this experiment, 121 diffraction images of LaB$_6$
@@ -726,19 +733,20 @@ most have only one ring and only a few images display 2 rings.
 Even if those images are technically suitable for 
 static detector calibration,
 they still represent a challenge due to the large 
-diffraction angles ($2\theta >30^o$), the low curvature of the rings and the difficulty to 
-assign the picked peaks to the proper calibrant ring number.
+diffraction angles ($2\theta >30^o$), to the low curvature of the rings and to the difficulty to 
+assign the picked peaks with the proper calibrant ring number.
 
 %The first images presenting two rings correspond to goniometer positions above
 %30 degrees. 
-Four images, taken at goniometer angles of 31.5, 33 and 35 and 35.5
-degrees have been manually calibrated,
+Four images
+%, taken at goniometer angles of 31.5, 33 and 35 and 35.5 degrees 
+have been manually calibrated,
 % using the \textit{pyFAI-calib2} tool
 %presented in the previous section.
 %This manual calibration is rather tedious and unstable due to the small
 %curvature of the rings on the detector image. 
-fixing the rotation along axis 1 of the detector ($rot_1=0$) 
-to guarantee some consistency between the four images.
+fixing the vertical rotation axis of the detector ($rot_1=0$) 
+to guarantee some consistency between the calibrations.
 
 
 \begin{figure}
@@ -760,11 +768,11 @@ model refined using the control points from the twenty images.
 Then, all other images were added to the model, and additional control
 points were automatically extracted from all images according to the
 previous geometry model.
-After all constraints and bounds were removed, the model has been refined
-again and used to generate a \textit{MultiGeometry} object, which is able to integrate many
+Finally, all constraints and bounds were removed, and the model has been refined
+again and used to generate a \textit{MultiGeometry} object, which is suitable for integrating many
 images together.
 After integration of all 121 images, the powder diffraction pattern displayed
-in Figure \ref{bm20}, orange curve, is obtained.
+in Figure \ref{bm20} is obtained (orange curve).
 All peaks of the curve appear at the correct scattering angle but
 the first few peaks look exceedingly broad. 
 
@@ -775,8 +783,9 @@ the first few peaks look exceedingly broad.
 \caption{Powder diffraction pattern obtained from 121 Pilatus 100k images acquired
 at goniometer angles ranging from 5 to 65 degrees on LaB6 reference sample at 16 keV. 
 The insert is a close-up view on the first peak showing the sharpness of the signal depending on the model.
-The orange curve correspond to the simple model where $rot_2$ depends linearly on the goniometer angle (6 $dof$).
-The blue curve corresponds to an advanced model where both rotations($rot_1$ and $rot_2$) depend linearly on the goniometer angle (7 $dof$).}
+The orange curve correspond to the simple model where $rot_2$ depends linearly on the goniometer angle (6 $DoF$).
+The blue curve corresponds to an advanced model where both rotations ($rot_1$ and $rot_2$) 
+depend linearly on the goniometer angle (7 $DoF$).}
 \end{center}
 \end{figure}
 
@@ -801,18 +810,17 @@ to depend on the goniometer position.}
 The fitting procedure averaged the $rot_1$ value (rotation around the vertical axis) over all images,
 but the Figure \ref{bm20_10}, which is taken on the first ring suggests this value is slightly wrong.
 The images of the last rings (visible in the notebook) indicate a small offset but in the other direction.
-Both shifts are small which suggests a first order correction:
-another model was tested, allowing both the $rot_1$ and $rot_2$ values to scale with the 
-goniometer position. 
+Both shifts being small suggests to use a first order correction on $rot_1$.
+A new model was tested where both the $rot_1$ and $rot_2$ values which are scaling with the 
+motor position. 
 %For larger rotation, coupling between rotation axis appears and it is advisable to rely on quaternion transformation.
 After refinement, the cost function dropped by a factor two and
 the low angle peaks became sharp (blue curve in Figure \ref{bm20}). 
 
-This parameter set was saved and allowed a few other compounds to be analysed and
-compared to the same pattern recorded via a moving point detector. 
-The signal/noise ratio was found to be better with an acquisition time which was one order
-of magnitude shorter than previously, thus opening new prospects for
-the ROBL beam-line.
+This parameter-set was saved and allowed a few other compounds to be analysed and
+compared to the same pattern recorded with the Pilatus being considered as a point detector. 
+The signal/noise ratio was found to be much better with an acquisition time 24 \times
+faster (10mn instead of 4h).
 
 A third example of goniometer calibration is available in \cite{rotation_xpad}. 
 It corresponds to the calibration of an ImXPAD detector \cite{BOUDET200341}
@@ -822,7 +830,7 @@ This detector is mounted on the goniometer arm at the D2AM beam-line
 This example is conceptually the same as the the one from the ROBL beam-line,
 with a few differences:
 \begin{itemize}
-  \item all images are fitted directly with 8 $dof$,
+  \item all images are fitted directly with 8 $DoF$,
   \item the detector being larger, the calculation time is
         longer, especially when it comes to ring extraction,
   \item the mask needs some extra care to remove a few hot pixels,
@@ -851,12 +859,13 @@ As the resolution of the powder diffraction pattern obtained is often limited by
 pixel size (and the sample-detector distance), this shrinkage of
 pixel sizes leads naturally to higher quality powder
 diffraction patterns.
-Unfortunately, to keep the area of the detector constant, one would need
+Unfortunately, to keep the covered $2\theta-$range constant, one would need
 to multiply the number of pixels by the square of the pixel size reduction
 factor, and the associated infrastructure for read-out and data transfer
 accordingly.
-Moving the detector offers a flexibility which partially removes this
-limitation.
+Moving the detector offers a flexibility which removes this
+limitation but makes the experiment slightly slower and often unsuitable 
+for $in-operando$ experiments.
 
 
 \section{Conclusion}
@@ -867,19 +876,20 @@ novice users.
 The concept of calibration of the detector position has been extended to fit
 the detector position as a function of the motion of a goniometer.   
 Once a few fixed positions of the goniometer have been calibrated, a model can
-be optimized to determine the detector position at any goniometer
+be optimized and the detector position can be extrapolated at any goniometer
 configuration.
 By acquiring multiple images at various positions, these images can be
 integrated together to produce a high-$q$ powder diffraction pattern of
 quality equivalent to the one acquired with a much larger detector, opening 
-up new opportunities for high resolution $in-situ$ and PDF measurements. 
-We believe 
+up new opportunities for $in-situ$ experiments and PDF measurements on most 
+synchrotron diffraction beam-lines. 
+
  
 \ack{Acknowledgements}
 
 We would like to thank all ESRF beam-line teams for supporting the
 pyFAI development, and especially David Flot from the MX-group who provided the
-data of the translation table and Nils Blanc and Christoph Hennig from the the
+data of the translation table and Nils Blanc and Christoph Hennig from the
 beam-lines BM02 (D2AM) and BM20 (ROBL) (respectively) for the goniometer data. 
 They gracefully provided beam time and test data to allow debugging this 
 goniometer optimisation tool.
