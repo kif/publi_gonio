@@ -111,7 +111,7 @@ arms for powder diffraction (for example, the Rigaku HyPix-3000 detector).
 %The larger number of pixels trades-of the resolution for speed.
 Detectors at synchrotrons are often mounted on goniometer or
 translation tables to provide the degrees of freedom (hereafter $DoF$) which are 
-needed to aligning the beam-line, although those $DoF$ are rarely used for data acquisition.
+needed to align the beam-line, although those $DoF$ are rarely used for data acquisition.
 One counter-example is reported in \cite{Gao:kc5032}, where the beam-line
 is equipped with a moving strip-detector, the Mythen detector (1D) from Dectris,
 but the Mythen is not an area detector.
@@ -129,8 +129,8 @@ one single frame \cite{Chupas:wf5000}.
 When speed is not critical, \textsc{pdf} experiments could be performed
 with small area detectors mounted on a motorized arm, and moved in front of
 the sample during the data acquisition to cover a larger solid angle. 
-A new pyFAI module which is dealing with goniometers and moving detectors is also presented.
-It offers to exploit the positioning system of the detector 
+A new pyFAI module which handles goniometers and moving detectors is also presented.
+It offers the ability to exploit the positioning system of the detector 
 (often readily available on beam-lines) to acquire powder diffraction or \textsc{pdf} data 
 on larger $q$-range with no additional cost or investment.
 
@@ -239,12 +239,15 @@ normalization_i}
 \end{equation}
 
 The normalization for solid angle correction, $\Omega$, has to be performed
-using an absolute solid angle reference system (unlike the case of single
-frame integration) as different geometries may have very different
-sample-to-detector distances.
+using an absolute solid angle reference system as different geometries may 
+have very different sample-to-detector distances.
+This is different from the integration in single frame mode, where pyFAI uses 
+the solid angle relative to the \textsc{poni}. 
 Hence integrated intensities in multi-geometry mode are orders of
-magnitude larger than using the ``normal'' pyFAI integration methods.
-
+magnitude larger than usual, the scale factor being the solid angle of one pixel
+at the \textsc{poni}, i.e. $dist^2/(pixel_1\times pixel_2)$.
+Errors are propagated in an similar way to equation (3) taking into account the 
+absolute solid angle normalization.
 \section{Calibration of the detector position}
 
 \subsection{Principle of the calibration using a Debye-Scherrer diffraction
@@ -372,10 +375,9 @@ The drawback is that some parameters are correlated or not optimized:
 \end{itemize}
  
 Those calibration parameters containing the geometry of the experimental setup 
-are saved in text files with the ``.poni'' extension, 
+are saved in a text files with the ``.poni'' extension, 
 also containing the detector definition and the wavelength.
-%which contains in addition the detector definition and the wavelength.
-Such file can subsequently be loaded into an \textit{azimuthal integrator}
+Such a file can subsequently be loaded into an \textit{azimuthal integrator}
 object, ready to perform the azimuthal regrouping of images coming from the detector.
 
 \subsection{Graphical user interface}
@@ -570,7 +572,7 @@ CostFunct = \frac{ \sum\limits_{i \in CtlPts} {(\Delta 2\theta_i)^2}}
 From a computer engineering perspective, 
 those \textit{transformation functions} present several contradictory challenges: 
 the user should be able to express any numerical transformation (flexibilty),
-but he should be prevented from executing any arbitrary code (security).  
+but should be prevented from executing any arbitrary code (security).  
 Moreover those functions should be made persistable on disk (i.e. saved) and 
 their restoration should be possible without having to re-perform the calibration, nor 
 creating vulnerabilities. 
@@ -579,9 +581,9 @@ The \textit{NumExpr} library \cite{numexpr} allows the evaluation of
 textual mathematical formulae into numerical
 functions offering an arbitrary number of parameters for 
 the goniometer definition and as many motors as needed.
-\textit{NumExpr} being a mathematical compiler, it cannot execute other type of code. 
+\textit{NumExpr}, being a mathematical compiler, cannot execute other type of code. 
 The mathematical expressions provided by the user are simply saved together with the motor names 
-and the parameter names and values in a \textsc{json}-format for persistence.
+and the parameter names and values in a \textsc{json}-format \cite{json} for persistence.
 
 In the following example, the definition of those functions is simply the creation 
 of an object from the 
@@ -627,7 +629,7 @@ linear function of the motor position.
 
 The content of this tutorial is available as a Jupyter
 notebook \cite{ipython} and forms part of the official documentation of pyFAI
-\cite{translation_table}, it is directly visible in a web-browser. 
+\cite{translation_table}; it is directly visible in a web-browser. 
 In addition, one can replay the notebook with Jupyter as it is self-consistent: 
 all images are automatically downloaded and cells can be
 modified or adapted.
@@ -821,9 +823,9 @@ This parameter-set was saved and allowed a few other compounds to be analysed an
 compared to the same pattern recorded with the Pilatus being considered as a point detector. 
 The signal/noise ratio was found to be much better with an acquisition time 24 times
 faster (10mn instead of 4h). 
-The average peak resolution of $FWHM=0.02^o$ obtained on LaB$_6$ (see notebook) 
+The average peak resolution of \textsc{fwhm} $=0.02^o$ obtained on LaB$_6$ (see notebook) 
 is a factor 10 worse than the highest achieved resolution with secondary monochromator on insertion devices \cite{Dejoie:kc5085},
-but such experiment requires 24 hours acquisition. 
+but such an experiment requires 24 hours acquisition. 
  
 
 A third example of goniometer calibration is available in \cite{rotation_xpad}. 
